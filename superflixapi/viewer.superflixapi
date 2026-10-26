@@ -1,0 +1,138 @@
+ viewer($post, $type, $players, $trailer, $size, $views, $ads = false, $image = false){
+		// Player API
+		switch (get_post_type($post)) {
+			case 'movies':
+				$postmeta = doo_postmeta_movies($post);
+				$ch = curl_init();
+				curl_setopt_array($ch, [
+					CURLOPT_URL => "https://superflixapi.monster/filme/{$postmeta['ids']}",
+					CURLOPT_HEADER => true,
+					CURLOPT_NOBODY => true,
+					CURLOPT_TIMEOUT => 5,
+					CURLOPT_FRESH_CONNECT => true,
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_SSL_VERIFYPEER => false
+				]);
+				curl_exec($ch);
+				if(curl_getinfo($ch)['http_code'] == 200) {
+					$players = array_merge(is_array($players) ? $players : [], [[
+						'name' => 'Principal HD',
+						'select' => 'iframe',
+						'idioma' => 'br',
+						'url' => "https://superflixapi.monster/filme/{$postmeta['ids']}"
+					]]);
+				}
+			break;
+			case 'episodes':
+				$postmeta = doo_postmeta_episodes($post);
+				$ids = doo_isset($postmeta,'ids');
+				$temporada = doo_isset($postmeta,'temporada');
+				$episodio = doo_isset($postmeta,'episodio');
+				$ch = curl_init();
+				curl_setopt_array($ch, [
+						CURLOPT_URL => "https://superflixapi.monster/serie/${ids}/${temporada}/${episodio}/",
+						CURLOPT_HEADER => true,
+						CURLOPT_NOBODY => true,
+						CURLOPT_TIMEOUT => 5,
+						CURLOPT_FRESH_CONNECT => true,
+						CURLOPT_RETURNTRANSFER => true,
+						CURLOPT_SSL_VERIFYPEER => false
+				]);
+				$response = @json_decode(curl_exec($ch));
+					$players = array_merge(is_array($players) ? $players : [], [[
+						'name' => 'Principal HD',
+						'select' => 'iframe',
+						'idioma' => 'br',
+						'url' => "https://superflixapi.monster/serie/${ids}/${temporada}/${episodio}/"
+					]]);
+			break;
+		}
+
+		
+		
+		$ajax_player = dooplay_get_option('playajax');
+		$play_pager  = doo_compose_pagelink('jwpage');
+		$source_name = dooplay_get_option('playsource');
+		$class_size  = ($size == 'regular') ? '' : ' bigger';
+		$set_mode    = ($ajax_player == true) ? 'ajax_mode' : 'no_ajax';
+		// Define size
+        if($size == 'regular'){
+            self::fake($image, 'regular');
+        }
+        if($players OR $trailer){
+			if(dooplay_get_option('playsourcescrolling') == true){
+				$ulclass = (!wp_is_mobile()) ? 'options scrolling' : 'options';
+			}else{
+				$ulclass = 'options';
+			}
+			$html ="<div class='dooplay_player'>";
+            $html .="<div id='playcontainer' class='play{$class_size}'>";
+            if(!empty($ads) && $ajax_player){
+                $html .="<div class='asgdc'>{$ads}</div>";
+            }
+			if($ajax_player == true){
+				$html .="<div id='dooplay_player_response'></div>";
+			} else {
+				$html .="<div id='dooplay_player_content'>";
+				$html .="<div id='source-player-trailer' class='source-box'><div class='pframe'>".doo_trailer_iframe($trailer)."</div></div>";
+				$num = 1;
+				if(!empty($players) && is_array($players)){
+	                foreach($players as $play){
+						// Set Source
+						$source = doo_isset($play,'url');
+						// HTML Player
+						$html .="<div id='source-player-{$num}' class='source-box'>";
+						switch (doo_isset($play,'select')) {
+							case 'mp4':
+								$html .="<div class='pframe'><if"."rame class='metaframe rptss' src='{$play_pager}?source=".urlencode($source)."&id={$post}&type=mp4' frameborder='0' scrolling='no' allow='autoplay; encrypted-media' allowfullscreen></ifr"."ame></div>";
+								break;
+							case 'iframe':
+								$html .="<div class='pframe'><if"."rame class='metaframe rptss' src='{$source}' frameborder='0' scrolling='no' allow='autoplay; encrypted-media' allowfullscreen></ifr"."ame></div>";
+								break;
+							case 'dtshcode':
+								$html .= "<div class='pframe'>".do_shortcode($source)."</div>";
+								break;
+						}
+						$html .="</div>";
+						$num++;
+					}
+				}
+				$html .="</div>";
+			}
+            $html .="</div>";
+            $html .="<h2>".__d('Video Sources')." <span id='playernotice' data-text='{$views}'>{$views}</span> ";
+			if(dooplay_get_option('report_form') == true)
+				$html .="<a href='#' class='report-video-error'>".__d('Report Error')."</a>";
+            $html .="</h2><div id='playeroptions' class='{$ulclass}'><ul id='playeroptionsul' class='{$set_mode}'>";
+            if($trailer != false){
+                $html .="<li id='player-option-trailer' class='dooplay_player_option' data-post='{$post}' data-type='{$type}' data-nume='trailer'>";
+                $html .="<i class='fas fa-play-circle'></i>";
+                $html .="<span class='title'>".__d('Watch trailer')."</span>";
+				if($source_name == true)
+                	$html .="<span class='server'>youtube.com</span>";
+                $html .="<span class='flag'><i class='yt fab fa-youtube'></i></span>";
+                $html .="<span class='loader'></span></li>";
+            }
+            $num = 1;
+            if(!empty($players) && is_array($players)){
+                foreach($players as $play){
+                    $html .="<li id='player-option-{$num}' class='dooplay_player_option' data-type='{$type}' data-post='{$post}' data-nume='{$num}'>";
+                    $html .="<i class='fas fa-play-circle'></i>";
+                    $html .="<span class='title'>{$play['name']}</span>";
+					if($source_name == true)
+                    	$html .="<span class='server'>".doo_compose_servername($play['url'], $play['select'])."</span>";
+                    if(!empty($play['idioma'])){
+                        $html .="<span class='flag'><img src='".DOO_URI."/assets/img/flags/{$play['idioma']}.png'></span>";
+                    }
+                    $html .="<span class='loader'></span></li>";
+                    $num++;
+                }
+            }
+            $html .="</ul></div>";
+            $html .="</div>";
+            echo $html;
+        }
+    }
+
+
+

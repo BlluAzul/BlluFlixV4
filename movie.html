@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- SEO Meta Tags -->
+  <title>Assistir Filme - BlluFlix</title>
+  <meta name="description" content="Assista este filme online grátis em HD no BlluFlix. Dublado e legendado.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/cinema.css?v=24">
+
+  <style>
+    /* Page specific styles */
+    .movie-detail {
+      min-height: 100vh;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: var(--accent-primary);
+      transform: translateX(-5px);
+    }
+
+    .back-button svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .movie-detail-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* === MOBILE RESPONSIVE FIXES === */
+    @media (max-width: 768px) {
+      .movie-detail-content {
+        max-width: 100%;
+        padding: 0 var(--spacing-md);
+      }
+
+      .cast-section {
+        margin: 0 var(--spacing-sm) var(--spacing-lg);
+      }
+
+      .related-section {
+        padding: var(--spacing-md);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .movie-detail-content {
+        padding: 0 var(--spacing-sm);
+      }
+
+      .cast-section {
+        margin: 0 var(--spacing-xs) var(--spacing-md);
+      }
+
+      .cast-card {
+        width: 100px;
+      }
+
+      .cast-photo {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    .cast-section {
+      margin: 0 var(--spacing-xl) var(--spacing-2xl);
+    }
+
+    .cast-grid {
+      display: flex;
+      gap: var(--spacing-md);
+      overflow-x: auto;
+      padding-bottom: var(--spacing-md);
+    }
+
+    .cast-card {
+      flex-shrink: 0;
+      width: 120px;
+      text-align: center;
+    }
+
+    .cast-photo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto var(--spacing-sm);
+      border: 3px solid var(--bg-tertiary);
+    }
+
+    .cast-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cast-character {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .related-section {
+      padding: var(--spacing-xl);
+    }
+
+    .audio-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .audio-badge.dubbed {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .audio-badge.subtitled {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+
+    @media (max-width: 768px) {
+      .back-button {
+        top: 10px;
+        left: 10px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .movie-detail-content {
+        margin-top: -100px;
+      }
+
+      .movie-backdrop-container {
+        height: 40vh;
+      }
+
+      .cast-section {
+        margin: 0 var(--spacing-md) var(--spacing-xl);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- DNS Notification Bar -->
+  <div id="dns-notification" class="notification-bar" style="display: none;">
+    <div class="notification-content">
+      <span class="notification-icon">⚠️</span>
+      <span class="notification-text">Tem que ativar o DNS se não o player não carrega! <a href="help.html"
+          style="color: #ffd700; text-decoration: underline;">Clique aqui para ver como</a></span>
+    </div>
+    <button class="notification-close" onclick="closeNotification()" title="Fechar aviso">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // Gerenciamento da Barra de Notificação
+    function initNotification() {
+      const isHidden = localStorage.getItem('hideDNSNotification');
+      const bar = document.getElementById('dns-notification');
+      if (!isHidden && bar) {
+        bar.style.display = 'flex';
+        // Auto-fechar após 3 segundos
+        setTimeout(() => {
+          closeNotification();
+        }, 5000);
+      }
+    }
+
+    function closeNotification() {
+      const bar = document.getElementById('dns-notification');
+      if (bar) {
+        bar.style.display = 'none';
+        localStorage.setItem('hideDNSNotification', 'true');
+      }
+    }
+
+    // Inicializa na carga da página
+    document.addEventListener('DOMContentLoaded', initNotification);
+  </script>
+
+  <!-- Back Button -->
+  <a href="index.html" class="back-button" onclick="goBack(event)">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+    </svg>
+    <span>Voltar</span>
+  </a>
+
+  <!-- Movie Detail Page -->
+  <div class="movie-detail" id="movie-detail">
+    <!-- Content loaded by JS -->
+    <div class="loading-container"
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px;">
+      <div class="spinner"></div>
+      <p style="color: var(--text-secondary);">Carregando informações do filme...</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/player.js"></script>
+
+  <!-- WatchTracker (Continuar Assistindo) -->
+  <script>
+    const WatchTracker = {
+      STORAGE_KEY: 'blluflix_watch_history',
+      MAX_ITEMS: Infinity,
+      save(data) {
+        const history = this.getAll();
+        const key = `${data.type}_${data.id}`;
+        const existingIndex = history.findIndex(item => `${item.type}_${item.id}` === key);
+        const entry = {
+          id: data.id, type: data.type, title: data.title,
+          poster_path: data.poster_path, backdrop_path: data.backdrop_path,
+          vote_average: data.vote_average,
+          release_date: data.release_date || data.first_air_date || '',
+          progress: data.progress || 15, lastWatched: Date.now(),
+          season: data.season || null, episode: data.episode || null
+        };
+        if (existingIndex !== -1) {
+          const existing = history[existingIndex];
+          entry.progress = Math.min(95, (existing.progress || 15) + Math.floor(Math.random() * 15) + 5);
+          if (data.season) entry.season = data.season;
+          if (data.episode) entry.episode = data.episode;
+          history.splice(existingIndex, 1);
+        }
+        history.unshift(entry);
+        // Sem limite de itens
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(history)); } catch (e) { }
+      },
+      getAll() {
+        try { const d = localStorage.getItem(this.STORAGE_KEY); return d ? JSON.parse(d) : []; } catch (e) { return []; }
+      },
+      remove(id, type) {
+        const h = this.getAll().filter(i => !(i.id == id && i.type === type));
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(h));
+      },
+      clear() { localStorage.removeItem(this.STORAGE_KEY); }
+    };
+    window.WatchTracker = WatchTracker;
+
+    // SaveTracker (Salvos)
+    const SaveTracker = {
+      STORAGE_KEY: 'blluflix_saved_items',
+      MAX_ITEMS: Infinity,
+      save(data) {
+        const items = this.getAll();
+        const key = `${data.type}_${data.id}`;
+        if (items.some(i => `${i.type}_${i.id}` === key)) return;
+        items.unshift({ id: data.id, type: data.type, title: data.title, poster_path: data.poster_path, backdrop_path: data.backdrop_path, vote_average: data.vote_average, release_date: data.release_date || '', savedAt: Date.now() });
+        // Sem limite de itens
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items)); } catch (e) { }
+      },
+      getAll() { try { const d = localStorage.getItem(this.STORAGE_KEY); return d ? JSON.parse(d) : []; } catch (e) { return []; } },
+      isSaved(id, type) { return this.getAll().some(i => i.id == id && i.type === type); },
+      toggle(data) { if (this.isSaved(data.id, data.type)) { this.remove(data.id, data.type); return false; } else { this.save(data); return true; } },
+      remove(id, type) { const items = this.getAll().filter(i => !(i.id == id && i.type === type)); localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items)); },
+      clear() { localStorage.removeItem(this.STORAGE_KEY); }
+    };
+    window.SaveTracker = SaveTracker;
+  </script>
+
+  <script>
+    // Estado do player
+    let player = null;
+    let movieData = null;
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const movieId = urlParams.get('id');
+      const autoPlay = urlParams.get('play') === '1';
+
+      if (!movieId) {
+        showError('ID do filme não encontrado');
+        return;
+      }
+
+      await loadMovieDetails(movieId, autoPlay);
+    });
+
+    async function loadMovieDetails(movieId, autoPlay = false) {
+      const container = document.getElementById('movie-detail');
+
+      try {
+        movieData = await tmdbAPI.getMovieDetails(movieId);
+
+        // Atualiza título da página
+        document.title = `${movieData.title} - BlluFlix`;
+
+        // Renderiza página
+        container.innerHTML = renderMovieDetail(movieData);
+
+        // Inicializa instância do player (mas não carrega vídeo ainda)
+        player = new StreamPlayer('player-container');
+
+        if (autoPlay) {
+          openPlayer();
+        }
+
+      } catch (error) {
+        console.error('Erro ao carregar filme:', error);
+        showError('Não foi possível carregar o filme');
+      }
+    }
+
+    function renderMovieDetail(movie) {
+      const backdrop = tmdbAPI.getImageUrl(movie.backdrop_path, 'backdrop', 'large');
+      const poster = tmdbAPI.getImageUrl(movie.poster_path, 'poster', 'large');
+      const rating = tmdbAPI.formatRating(movie.vote_average);
+      const year = tmdbAPI.getYear(movie.release_date);
+      const runtime = tmdbAPI.formatRuntime(movie.runtime);
+      const genres = movie.genres?.map(g => g.name).join(', ') || 'N/A';
+
+      // Cast principal
+      const cast = movie.credits?.cast?.slice(0, 10) || [];
+
+      // Filmes relacionados
+      const related = movie.recommendations?.results?.slice(0, 10) || movie.similar?.results?.slice(0, 10) || [];
+
+      return `
+        <!-- Backdrop -->
+        <div class="movie-backdrop-container">
+          <img src="${backdrop}" alt="${movie.title}" class="movie-backdrop-img">
+          <div class="movie-backdrop-overlay"></div>
+        </div>
+        
+        <!-- Movie Info -->
+        <div class="movie-detail-content">
+          <div class="movie-detail-header">
+            <div class="movie-detail-poster">
+              <img src="${poster}" alt="${movie.title}">
+            </div>
+            
+            <div class="movie-detail-info">
+              <h1 class="movie-detail-title">${movie.title}</h1>
+              
+              <div class="movie-detail-meta">
+                <span class="rating">⭐ ${rating}</span>
+                <span class="separator"></span>
+                <span>${year}</span>
+                <span class="separator"></span>
+                <span>${runtime}</span>
+                <span class="separator"></span>
+                <span>${genres}</span>
+              </div>
+              
+              <div class="movie-genres" style="margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="audio-badge dubbed">🎙️ Dublado Disponível</span>
+                <span class="audio-badge subtitled">📝 Legendado Disponível</span>
+              </div>
+
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 12px 16px; border-radius: 8px; border-left: 3px solid var(--accent-primary); margin-bottom: 20px;">
+                <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; font-style: italic;">
+                  <span style="font-weight: bold; color: var(--text-primary);">Nota:</span> Opa, antes de mais nada gostaria de informar que alguns filmes não lançados vão aparecer com áudio disponível, mas não vão estar funcionando, ou é outro filme por conta do player usado <3
+                </p>
+              </div>
+              
+              <p class="movie-detail-description">
+                ${movie.overview || 'Sinopse não disponível.'}
+              </p>
+              
+              <div class="movie-detail-buttons">
+                <button class="btn btn-primary" onclick="openPlayer()">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                  Assistir Agora
+                </button>
+                <button class="btn btn-secondary save-detail-btn" id="save-btn" onclick="toggleSaveDetail()">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                  </svg>
+                  <span id="save-btn-text">${SaveTracker.isSaved(movie.id, 'movie') ? 'Salvo' : 'Salvar'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Player Modal -->
+        <div id="player-modal" class="player-modal">
+          <div class="player-modal-content">
+            <button class="player-close-btn" onclick="closePlayer()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+            
+            <div id="server-tabs"></div>
+            
+            <div class="player-container" id="player-container">
+              <div class="player-loading">
+                <div class="spinner"></div>
+                <p>Carregando player...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Cast Section -->
+        ${cast.length > 0 ? `
+          <section class="cast-section">
+            <div class="section-header">
+              <h2 class="section-title">🎭 Elenco Principal</h2>
+            </div>
+            <div class="cast-grid">
+              ${cast.map(person => `
+                <div class="cast-card">
+                  <img 
+                    src="${person.profile_path ? tmdbAPI.getImageUrl(person.profile_path, 'poster', 'small') : 'https://via.placeholder.com/100x100/1a1a25/6b6b7b?text=' + person.name.charAt(0)}" 
+                    alt="${person.name}" 
+                    class="cast-photo"
+                    loading="lazy"
+                  >
+                  <p class="cast-name">${person.name}</p>
+                  <p class="cast-character">${person.character}</p>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        ` : ''}
+        
+        <!-- Related Movies -->
+        ${related.length > 0 ? `
+          <section class="related-section section">
+            <div class="section-header">
+              <h2 class="section-title">🎬 Filmes Relacionados</h2>
+            </div>
+            
+            <div class="movies-slider-wrapper">
+              <button class="slider-arrow prev" onclick="scrollSlider('related-movies', 'left')">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+              </button>
+              
+              <div class="movies-row" id="related-movies">
+                ${related.map(m => createMovieCard(m)).join('')}
+              </div>
+              
+              <button class="slider-arrow next" onclick="scrollSlider('related-movies', 'right')">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                </svg>
+              </button>
+            </div>
+          </section>
+        ` : ''}
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="footer-content">
+            <div class="footer-logo">BlluFlix</div>
+            <div class="footer-links">
+              <a href="index.html" class="footer-link">Início</a>
+              <a href="#" class="footer-link">DMCA</a>
+              <a href="information.html" class="footer-link">Informação</a>
+            </div>
+            <p class="footer-text">
+              Assista filmes e séries online grátis.
+            </p>
+            <p class="footer-text" style="margin-top: 20px; font-size: 0.8rem;">
+              © 2026 BlluFlix. Este site não armazena nenhum conteúdo em seus servidores.
+            </p>
+          </div>
+        </footer>
+      `;
+    }
+
+    function createMovieCard(movie) {
+      const poster = tmdbAPI.getImageUrl(movie.poster_path, 'poster', 'medium');
+      const rating = tmdbAPI.formatRating(movie.vote_average);
+      const year = tmdbAPI.getYear(movie.release_date);
+
+      return `
+        <div class="movie-card" onclick="goToMovie(${movie.id})">
+          <div class="movie-card-inner">
+            <img src="${poster}" alt="${movie.title}" class="movie-poster" loading="lazy">
+            <span class="movie-quality">HD</span>
+            <span class="movie-rating">⭐ ${rating}</span>
+            <div class="movie-card-overlay">
+              <div class="movie-play-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="movie-info">
+            <h3 class="movie-title">${movie.title}</h3>
+            <div class="movie-meta">
+              <span>${year}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openPlayer() {
+      const modal = document.getElementById('player-modal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Lock scroll
+
+      // Salva no histórico de "Continuar Assistindo"
+      if (movieData) {
+        WatchTracker.save({
+          id: movieData.id,
+          type: 'movie',
+          title: movieData.title,
+          poster_path: movieData.poster_path,
+          backdrop_path: movieData.backdrop_path,
+          vote_average: movieData.vote_average,
+          release_date: movieData.release_date
+        });
+      }
+
+      // Only init if not already created
+      if (!player.currentServer && movieData) {
+        // Passa IMDB ID se disponível (necessário para PlayerFlix)
+        const imdbId = movieData.imdb_id || movieData.external_ids?.imdb_id || null;
+        player.initMovie(movieData.id, imdbId);
+      }
+    }
+
+    function toggleSaveDetail() {
+      if (!movieData) return;
+      const saved = SaveTracker.toggle({
+        id: movieData.id,
+        type: 'movie',
+        title: movieData.title,
+        poster_path: movieData.poster_path,
+        backdrop_path: movieData.backdrop_path,
+        vote_average: movieData.vote_average,
+        release_date: movieData.release_date
+      });
+      const btn = document.getElementById('save-btn');
+      const text = document.getElementById('save-btn-text');
+      if (btn) btn.classList.toggle('saved', saved);
+      if (text) text.textContent = saved ? 'Salvo' : 'Salvar';
+    }
+
+    function closePlayer() {
+      const modal = document.getElementById('player-modal');
+      modal.classList.remove('active');
+      document.body.style.overflow = ''; // Unlock scroll
+
+      // Optional: Destroy player to stop video
+      // player.destroy(); 
+      // Better behavior: keep state or pause? 
+      // For now, let's destroy to stop audio.
+      if (player) {
+        // Manually clear iframe to stop audio
+        const container = document.getElementById('player-container');
+        if (container) container.innerHTML = '<div class="player-loading"><div class="spinner"></div><p>Carregando player...</p></div>';
+        player.currentServer = null;
+      }
+    }
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePlayer();
+    });
+
+    // Remove unused scrollToPlayer
+    /* function scrollToPlayer() ... */
+
+    function goToMovie(id) {
+      window.location.href = `movie.html?id=${id}`;
+    }
+
+    function scrollSlider(elementId, direction) {
+      const container = document.getElementById(elementId);
+      if (container) {
+        const scrollAmount = 500;
+        const currentScroll = container.scrollLeft;
+
+        container.scrollTo({
+          left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('movie-detail').innerHTML = `
+        <div class="error-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; text-align: center; padding: 20px;">
+          <svg viewBox="0 0 24 24" fill="var(--accent-primary)" width="64" height="64">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <h2 style="font-size: 1.5rem;">${message}</h2>
+          <a href="index.html" class="btn btn-primary">Voltar ao Início</a>
+        </div>
+      `;
+    }
+  </script>
+  <script src="assets/js/cinema.js?v=24" defer></script>
+</body>
+
+</html>

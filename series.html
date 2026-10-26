@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- SEO Meta Tags -->
+  <title>Assistir Série - BlluFlix</title>
+  <meta name="description" content="Assista esta série online grátis em HD no BlluFlix. Dublado e legendado.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/cinema.css?v=24">
+
+  <style>
+    .movie-detail {
+      min-height: 100vh;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: var(--accent-primary);
+      transform: translateX(-5px);
+    }
+
+    .back-button svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .movie-detail-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* === MOBILE RESPONSIVE FIXES === */
+    @media (max-width: 768px) {
+      .movie-detail-content {
+        max-width: 100%;
+        padding: 0 var(--spacing-md);
+      }
+
+      .seasons-section {
+        margin: 0 var(--spacing-sm) var(--spacing-lg);
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-md);
+      }
+
+      .cast-section {
+        margin: 0 var(--spacing-sm) var(--spacing-lg);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .movie-detail-content {
+        padding: 0 var(--spacing-sm);
+      }
+
+      .seasons-section {
+        margin: 0 var(--spacing-xs) var(--spacing-md);
+        padding: var(--spacing-sm);
+      }
+
+      .seasons-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: flex-start;
+      }
+
+      .season-select {
+        width: 100%;
+      }
+
+      .episode-card {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+
+      .episode-thumb {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+      }
+    }
+
+    /* Seasons & Episodes */
+    .seasons-section {
+      padding: var(--spacing-xl);
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius-lg);
+      margin: 0 var(--spacing-xl) var(--spacing-xl);
+    }
+
+    .seasons-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-lg);
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .seasons-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .season-select {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      padding-right: 40px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a0a0b0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    .season-select:focus {
+      border-color: var(--accent-primary);
+      outline: none;
+    }
+
+    .episodes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .episode-card {
+      display: flex;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--bg-tertiary);
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .episode-card:hover {
+      background: var(--bg-card);
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .episode-card.active {
+      border-color: var(--accent-primary);
+      background: rgba(229, 9, 20, 0.1);
+    }
+
+    .episode-thumb {
+      width: 120px;
+      height: 68px;
+      border-radius: var(--border-radius-sm);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .episode-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .episode-number {
+      font-size: 0.75rem;
+      color: var(--accent-primary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .episode-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .episode-overview {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .audio-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .audio-badge.dubbed {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .audio-badge.subtitled {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+
+    .cast-section {
+      margin: 0 var(--spacing-xl) var(--spacing-2xl);
+    }
+
+    .cast-grid {
+      display: flex;
+      gap: var(--spacing-md);
+      overflow-x: auto;
+      padding-bottom: var(--spacing-md);
+    }
+
+    .cast-card {
+      flex-shrink: 0;
+      width: 120px;
+      text-align: center;
+    }
+
+    .cast-photo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto var(--spacing-sm);
+      border: 3px solid var(--bg-tertiary);
+    }
+
+    .cast-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cast-character {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 768px) {
+      .back-button {
+        top: 10px;
+        left: 10px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .movie-detail-content {
+        margin-top: -100px;
+      }
+
+      .movie-backdrop-container {
+        height: 40vh;
+      }
+
+      .seasons-section {
+        margin: 0 var(--spacing-md) var(--spacing-xl);
+        padding: var(--spacing-md);
+      }
+
+      .episodes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .episode-thumb {
+        width: 80px;
+        height: 45px;
+      }
+
+      .cast-section {
+        margin: 0 var(--spacing-md) var(--spacing-xl);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- AdGuard DNS Notification Bar -->
+  <div id="dns-notification" class="notification-bar" style="display: none;">
+    <div class="notification-content">
+      <span class="notification-icon">🛡️</span>
+      <span class="notification-text">Dica: Use DNS AdGuard para remover os anúncios do player PC e Mobile.</span>
+    </div>
+    <button class="notification-close" onclick="closeNotification()" title="Fechar aviso">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // Gerenciamento da Barra de Notificação
+    function initNotification() {
+      const isHidden = localStorage.getItem('hideDNSNotification');
+      const bar = document.getElementById('dns-notification');
+      if (!isHidden && bar) {
+        bar.style.display = 'flex';
+        // Auto-fechar após 3 segundos
+        setTimeout(() => {
+          closeNotification();
+        }, 5000);
+      }
+    }
+
+    function closeNotification() {
+      const bar = document.getElementById('dns-notification');
+      if (bar) {
+        bar.style.display = 'none';
+        localStorage.setItem('hideDNSNotification', 'true');
+      }
+    }
+
+    // Inicializa na carga da página
+    document.addEventListener('DOMContentLoaded', initNotification);
+  </script>
+
+  <!-- Back Button -->
+  <a href="index.html" class="back-button" onclick="goBack(event)">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+    </svg>
+    <span>Voltar</span>
+  </a>
+
+  <!-- Series Detail Page -->
+  <div class="movie-detail" id="series-detail">
+    <div class="loading-container"
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px;">
+      <div class="spinner"></div>
+      <p style="color: var(--text-secondary);">Carregando informações da série...</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/player.js"></script>
+
+  <!-- WatchTracker (Continuar Assistindo) -->
+  <script>
+    const WatchTracker = {
+      STORAGE_KEY: 'blluflix_watch_history',
+      MAX_ITEMS: Infinity,
+      save(data) {
+        const history = this.getAll();
+        const key = `${data.type}_${data.id}`;
+        const existingIndex = history.findIndex(item => `${item.type}_${item.id}` === key);
+        const entry = {
+          id: data.id, type: data.type, title: data.title,
+          poster_path: data.poster_path, backdrop_path: data.backdrop_path,
+          vote_average: data.vote_average,
+          release_date: data.release_date || data.first_air_date || '',
+          progress: data.progress || 15, lastWatched: Date.now(),
+          season: data.season || null, episode: data.episode || null
+        };
+        if (existingIndex !== -1) {
+          const existing = history[existingIndex];
+          entry.progress = Math.min(95, (existing.progress || 15) + Math.floor(Math.random() * 15) + 5);
+          if (data.season) entry.season = data.season;
+          if (data.episode) entry.episode = data.episode;
+          history.splice(existingIndex, 1);
+        }
+        history.unshift(entry);
+        // Sem limite de itens
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(history)); } catch (e) { }
+      },
+      getAll() {
+        try { const d = localStorage.getItem(this.STORAGE_KEY); return d ? JSON.parse(d) : []; } catch (e) { return []; }
+      },
+      remove(id, type) {
+        const h = this.getAll().filter(i => !(i.id == id && i.type === type));
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(h));
+      },
+      clear() { localStorage.removeItem(this.STORAGE_KEY); }
+    };
+    window.WatchTracker = WatchTracker;
+
+    // SaveTracker (Salvos)
+    const SaveTracker = {
+      STORAGE_KEY: 'blluflix_saved_items',
+      MAX_ITEMS: Infinity,
+      save(data) {
+        const items = this.getAll();
+        const key = `${data.type}_${data.id}`;
+        if (items.some(i => `${i.type}_${i.id}` === key)) return;
+        items.unshift({ id: data.id, type: data.type, title: data.title, poster_path: data.poster_path, backdrop_path: data.backdrop_path, vote_average: data.vote_average, release_date: data.release_date || '', savedAt: Date.now() });
+        // Sem limite de itens
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items)); } catch (e) { }
+      },
+      getAll() { try { const d = localStorage.getItem(this.STORAGE_KEY); return d ? JSON.parse(d) : []; } catch (e) { return []; } },
+      isSaved(id, type) { return this.getAll().some(i => i.id == id && i.type === type); },
+      toggle(data) { if (this.isSaved(data.id, data.type)) { this.remove(data.id, data.type); return false; } else { this.save(data); return true; } },
+      remove(id, type) { const items = this.getAll().filter(i => !(i.id == id && i.type === type)); localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items)); },
+      clear() { localStorage.removeItem(this.STORAGE_KEY); }
+    };
+    window.SaveTracker = SaveTracker;
+  </script>
+
+  <script>
+    // Estado
+    let player = null;
+    let seriesData = null;
+    let currentSeason = 1;
+    let currentEpisode = 1;
+    let seasonData = null;
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const seriesId = urlParams.get('id');
+      const autoPlay = urlParams.get('play') === '1';
+
+      if (!seriesId) {
+        showError('ID da série não encontrado');
+        return;
+      }
+
+      await loadSeriesDetails(seriesId, autoPlay);
+    });
+
+    async function loadSeriesDetails(seriesId, autoPlay = false) {
+      const container = document.getElementById('series-detail');
+
+      try {
+        seriesData = await tmdbAPI.getTVShowDetails(seriesId);
+
+        // Atualiza título da página
+        document.title = `${seriesData.name} - BlluFlix`;
+
+        // Tenta recuperar do histórico de Assistindo
+        const history = WatchTracker.getAll();
+        const savedItem = history.find(item => item.id == seriesId && item.type === 'tv');
+
+        if (savedItem && savedItem.season && savedItem.episode) {
+            currentSeason = savedItem.season;
+            currentEpisode = savedItem.episode;
+        } else if (seriesData.seasons && seriesData.seasons.length > 0) {
+            // Encontra primeira temporada válida (não temporada 0/especiais)
+            const firstValidSeason = seriesData.seasons.find(s => s.season_number > 0) || seriesData.seasons[0];
+            currentSeason = firstValidSeason.season_number;
+            currentEpisode = 1;
+        }
+
+        if (seriesData.seasons && seriesData.seasons.length > 0) {
+          await loadSeasonEpisodes(seriesId, currentSeason);
+        }
+
+        // Renderiza página
+        container.innerHTML = renderSeriesDetail(seriesData);
+
+        // Inicializa instância do player
+        player = new StreamPlayer('player-container');
+        
+        if (autoPlay) {
+          openPlayer();
+        }
+
+      } catch (error) {
+        console.error('Erro ao carregar série:', error);
+        showError('Não foi possível carregar a série');
+      }
+    }
+
+    async function loadSeasonEpisodes(seriesId, seasonNumber) {
+      try {
+        seasonData = await tmdbAPI.getTVSeasonDetails(seriesId, seasonNumber);
+        currentEpisode = 1;
+      } catch (error) {
+        console.error('Erro ao carregar temporada:', error);
+        seasonData = null;
+      }
+    }
+
+    async function changeSeason(seasonNumber) {
+      currentSeason = parseInt(seasonNumber);
+      currentEpisode = 1; // Reset para primeiro episódio da nova temporada
+      await loadSeasonEpisodes(seriesData.id, currentSeason);
+
+      // Atualiza lista de episódios
+      const episodesGrid = document.getElementById('episodes-grid');
+      if (episodesGrid && seasonData) {
+        episodesGrid.innerHTML = renderEpisodes(seasonData.episodes);
+      }
+
+      // Reseta o player para que reinicialize com a nova temporada quando selecionado
+      if (player) {
+        player.currentServer = null;
+      }
+
+      // Atualiza episódio ativo
+      updateActiveEpisode(1);
+    }
+
+    function playEpisode(episodeNumber) {
+      currentEpisode = episodeNumber;
+      updateActiveEpisode(episodeNumber);
+
+      // Sempre reinicializa o player com o episódio selecionado
+      if (player && seriesData) {
+        // Limpa o player atual para forçar reinicialização
+        player.currentServer = null;
+        // Abre o modal e inicializa com o episódio correto
+        openPlayer();
+      }
+    }
+
+    function updateActiveEpisode(episodeNumber) {
+      document.querySelectorAll('.episode-card').forEach((card, index) => {
+        card.classList.toggle('active', index + 1 === episodeNumber);
+      });
+    }
+
+    function renderSeriesDetail(series) {
+      const backdrop = tmdbAPI.getImageUrl(series.backdrop_path, 'backdrop', 'large');
+      const poster = tmdbAPI.getImageUrl(series.poster_path, 'poster', 'large');
+      const rating = tmdbAPI.formatRating(series.vote_average);
+      const year = tmdbAPI.getYear(series.first_air_date);
+      const genres = series.genres?.map(g => g.name).join(', ') || 'N/A';
+      const seasons = series.seasons?.filter(s => s.season_number > 0) || [];
+
+      // Cast
+      const cast = series.credits?.cast?.slice(0, 10) || [];
+
+      // Séries relacionadas
+      const related = series.recommendations?.results?.slice(0, 10) || series.similar?.results?.slice(0, 10) || [];
+
+      return `
+        <!-- Backdrop -->
+        <div class="movie-backdrop-container">
+          <img src="${backdrop}" alt="${series.name}" class="movie-backdrop-img">
+          <div class="movie-backdrop-overlay"></div>
+        </div>
+        
+        <!-- Series Info -->
+        <div class="movie-detail-content">
+          <div class="movie-detail-header">
+            <div class="movie-detail-poster">
+              <img src="${poster}" alt="${series.name}">
+            </div>
+            
+            <div class="movie-detail-info">
+              <h1 class="movie-detail-title">${series.name}</h1>
+              
+              <div class="movie-detail-meta">
+                <span class="rating">⭐ ${rating}</span>
+                <span class="separator"></span>
+                <span>${year}</span>
+                <span class="separator"></span>
+                <span>${series.number_of_seasons} Temporada${series.number_of_seasons > 1 ? 's' : ''}</span>
+                <span class="separator"></span>
+                <span>${genres}</span>
+              </div>
+              
+              <div class="movie-genres" style="margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="audio-badge dubbed">🎙️ Dublado Disponível</span>
+                <span class="audio-badge subtitled">📝 Legendado Disponível</span>
+              </div>
+              
+              <p class="movie-detail-description">
+                ${series.overview || 'Sinopse não disponível.'}
+              </p>
+              
+              <div class="movie-detail-buttons">
+                <button class="btn btn-primary" onclick="openPlayer()">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                  Assistir Agora
+                </button>
+                <button class="btn btn-secondary save-detail-btn" id="save-btn" onclick="toggleSaveDetail()">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                  </svg>
+                  <span id="save-btn-text">${SaveTracker.isSaved(series.id, 'tv') ? 'Salvo' : 'Salvar'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Player Modal -->
+        <div id="player-modal" class="player-modal">
+          <div class="player-modal-content">
+            <button class="player-close-btn" onclick="closePlayer()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+            
+            <div id="server-tabs"></div>
+            
+            <div class="player-container" id="player-container">
+              <div class="player-loading">
+                <div class="spinner"></div>
+                <p>Carregando player...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Seasons & Episodes -->
+        <section class="seasons-section">
+          <div class="seasons-header">
+            <h2 class="seasons-title">📋 Episódios</h2>
+            <select class="season-select" id="season-select" onchange="changeSeason(this.value)">
+              ${seasons.map(s => `
+                <option value="${s.season_number}" ${s.season_number === currentSeason ? 'selected' : ''}>
+                  Temporada ${s.season_number} (${s.episode_count} eps)
+                </option>
+              `).join('')}
+            </select>
+          </div>
+          <div class="episodes-grid" id="episodes-grid">
+            ${seasonData ? renderEpisodes(seasonData.episodes) : '<p style="color: var(--text-muted);">Carregando episódios...</p>'}
+          </div>
+        </section>
+        
+        <!-- Cast Section -->
+        ${cast.length > 0 ? `
+          <section class="cast-section">
+            <div class="section-header">
+              <h2 class="section-title">🎭 Elenco Principal</h2>
+            </div>
+            <div class="cast-grid">
+              ${cast.map(person => `
+                <div class="cast-card">
+                  <img 
+                    src="${person.profile_path ? tmdbAPI.getImageUrl(person.profile_path, 'poster', 'small') : 'https://via.placeholder.com/100x100/1a1a25/6b6b7b?text=' + person.name.charAt(0)}" 
+                    alt="${person.name}" 
+                    class="cast-photo"
+                    loading="lazy"
+                  >
+                  <p class="cast-name">${person.name}</p>
+                  <p class="cast-character">${person.character}</p>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        ` : ''}
+        
+        <!-- Related Series -->
+        ${related.length > 0 ? `
+          <section class="related-section section" style="padding: var(--spacing-xl);">
+            <div class="section-header">
+              <h2 class="section-title">📺 Séries Relacionadas</h2>
+            </div>
+            <div class="movies-row">
+              ${related.map(s => createSeriesCard(s)).join('')}
+            </div>
+          </section>
+        ` : ''}
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="footer-content">
+            <div class="footer-logo">BlluFlix</div>
+            <div class="footer-links">
+              <a href="index.html" class="footer-link">Início</a>
+              <a href="#" class="footer-link">DMCA</a>
+              <a href="information.html" class="footer-link">Informação</a>
+            </div>
+            <p class="footer-text">
+              Assista filmes e séries online grátis.
+            </p>
+            <p class="footer-text" style="margin-top: 20px; font-size: 0.8rem;">
+              © 2026 BlluFlix. Este site não armazena nenhum conteúdo em seus servidores.
+            </p>
+          </div>
+        </footer>
+      `;
+    }
+
+    function renderEpisodes(episodes) {
+      if (!episodes || episodes.length === 0) {
+        return '<p style="color: var(--text-muted);">Nenhum episódio disponível.</p>';
+      }
+
+      return episodes.map((ep, index) => {
+        const thumb = ep.still_path
+          ? tmdbAPI.getImageUrl(ep.still_path, 'backdrop', 'small')
+          : 'https://via.placeholder.com/120x68/1a1a25/6b6b7b?text=Ep+' + ep.episode_number;
+
+        return `
+          <div class="episode-card ${index + 1 === currentEpisode ? 'active' : ''}" onclick="playEpisode(${ep.episode_number})">
+            <img src="${thumb}" alt="Episódio ${ep.episode_number}" class="episode-thumb" loading="lazy">
+            <div class="episode-info">
+              <span class="episode-number">Episódio ${ep.episode_number}</span>
+              <h4 class="episode-name">${ep.name || 'Episódio ' + ep.episode_number}</h4>
+              <p class="episode-overview">${ep.overview || 'Sem descrição disponível.'}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createSeriesCard(series) {
+      const poster = tmdbAPI.getImageUrl(series.poster_path, 'poster', 'medium');
+      const rating = tmdbAPI.formatRating(series.vote_average);
+      const year = tmdbAPI.getYear(series.first_air_date);
+
+      return `
+        <div class="movie-card" onclick="goToSeries(${series.id})">
+          <div class="movie-card-inner">
+            <img src="${poster}" alt="${series.name}" class="movie-poster" loading="lazy">
+            <span class="movie-quality">SÉRIE</span>
+            <span class="movie-rating">⭐ ${rating}</span>
+            <div class="movie-card-overlay">
+              <div class="movie-play-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="movie-info">
+            <h3 class="movie-title">${series.name}</h3>
+            <div class="movie-meta">
+              <span>${year}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openPlayer() {
+      const modal = document.getElementById('player-modal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Salva no histórico de "Continuar Assistindo"
+      if (seriesData) {
+        WatchTracker.save({
+          id: seriesData.id,
+          type: 'tv',
+          title: seriesData.name,
+          poster_path: seriesData.poster_path,
+          backdrop_path: seriesData.backdrop_path,
+          vote_average: seriesData.vote_average,
+          release_date: seriesData.first_air_date,
+          season: currentSeason,
+          episode: currentEpisode
+        });
+      }
+
+      // Init if not started
+      if (!player.currentServer && seriesData) {
+        player.initTV(seriesData.id, currentSeason, currentEpisode);
+      }
+    }
+
+    function toggleSaveDetail() {
+      if (!seriesData) return;
+      const saved = SaveTracker.toggle({
+        id: seriesData.id,
+        type: 'tv',
+        title: seriesData.name,
+        poster_path: seriesData.poster_path,
+        backdrop_path: seriesData.backdrop_path,
+        vote_average: seriesData.vote_average,
+        release_date: seriesData.first_air_date
+      });
+      const btn = document.getElementById('save-btn');
+      const text = document.getElementById('save-btn-text');
+      if (btn) btn.classList.toggle('saved', saved);
+      if (text) text.textContent = saved ? 'Salvo' : 'Salvar';
+    }
+
+    function closePlayer() {
+      const modal = document.getElementById('player-modal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+
+      if (player) {
+        const container = document.getElementById('player-container');
+        if (container) container.innerHTML = '<div class="player-loading"><div class="spinner"></div><p>Carregando player...</p></div>';
+        player.currentServer = null;
+      }
+    }
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePlayer();
+    });
+
+    function scrollToPlayer() {
+      // document.getElementById('player-section')?.scrollIntoView({ ... });
+    }
+
+    function goToSeries(id) {
+      window.location.href = `series.html?id=${id}`;
+    }
+
+    function showError(message) {
+      document.getElementById('series-detail').innerHTML = `
+        <div class="error-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; text-align: center; padding: 20px;">
+          <svg viewBox="0 0 24 24" fill="var(--accent-primary)" width="64" height="64">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <h2 style="font-size: 1.5rem;">${message}</h2>
+          <a href="index.html" class="btn btn-primary">Voltar ao Início</a>
+        </div>
+      `;
+    }
+  </script>
+  <script src="assets/js/cinema.js?v=24" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Guia de configuração DNS AdGuard para BlluFlix.">
+    <meta name="theme-color" content="#0f0f13">
+    <title>Remover Anúncios - BlluFlix</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/cinema.css?v=24">
+</head>
+
+<body>
+
+    <div class="standalone-container">
+        <header class="help-navbar">
+            <a href="index.html" class="help-back-btn" onclick="goBack(event)">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+
+            <script>
+                function goBack(e) {
+                    if (e) e.preventDefault();
+                    if (window.history.length > 1 && document.referrer.includes(window.location.hostname)) {
+                        window.history.back();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            </script>
+            <div class="help-logo">
+                <span class="logo-text">BlluFlix</span>
+            </div>
+            <div class="help-spacer"></div> <!-- Spacer for centering -->
+        </header>
+
+        <main class="help-main">
+            <div class="help-hero">
+                <h1 class="help-hero-title">O player não carrega?</h1>
+                <p class="help-hero-desc">
+                    Configure o DNS ADGUARD para o PLAYER CARREGAR e para bloquear propagandas irritantes nos players. É
+                    grátis, seguro e leva
+                    1 minuto.
+                </p>
+            </div>
+
+            <div class="platforms-grid">
+                <!-- ANDROID -->
+                <div class="tutorial-card">
+                    <div class="card-header android">
+                        <i class="fab fa-android"></i>
+                        <h2>Android</h2>
+                    </div>
+                    <div class="card-body">
+                        <ol class="steps">
+                            <li>Abra as <strong>Configurações</strong> > <strong>Conexões</strong>.</li>
+                            <li>Toque em <strong>Mais configurações de conexão</strong> ou busca por "DNS".</li>
+                            <li>Selecione <strong>DNS Privado</strong> e escolha "Nome do host do provedor".</li>
+                            <li>
+                                Digite o endereço abaixo e salve:
+                                <div class="dns-box"
+                                    onclick="navigator.clipboard.writeText('dns.adguard.com'); alert('Copiado!')">
+                                    <span>dns.adguard.com</span>
+                                    <i class="far fa-copy"></i>
+                                </div>
+                            </li>
+                        </ol>
+                        <div class="tutorial-image-container" onclick="openImageModal('assets/img/android_dns.jpg')">
+                            <img src="assets/img/android_dns.jpg" alt="Configuração DNS Android" class="tutorial-image">
+                            <div class="image-hint"><i class="fas fa-search-plus"></i> Ampliar</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- iOS -->
+                <div class="tutorial-card">
+                    <div class="card-header ios">
+                        <i class="fab fa-apple"></i>
+                        <h2>iPhone / iOS</h2>
+                    </div>
+                    <div class="card-body">
+                        <ol class="steps">
+                            <li>
+                                Baixe o perfil oficial do AdGuard (Recomendado):
+                                <a href="https://dns.adguard.com/public.mobileconfig" target="_blank"
+                                    class="download-link">Baixar Perfil <i class="fas fa-download"></i></a>
+                            </li>
+                            <li>Vá em <strong>Ajustes</strong> > <strong>Geral</strong> > <strong>VPN e
+                                    Gerenciamento</strong>.</li>
+                            <li>Toque no perfil baixado "AdGuard DNS" e instale.</li>
+                        </ol>
+                        <div class="help-fallback">
+                            <p>Como não temos um print aqui, você pode ver o passo a passo em vídeo:</p>
+                            <a href="https://www.youtube.com/results?search_query=como+instalar+dns+adguard+iphone"
+                                target="_blank" class="fallback-link">
+                                <i class="fab fa-youtube"></i> Ver Tutorial no YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PC -->
+                <div class="tutorial-card">
+                    <div class="card-header pc">
+                        <i class="fab fa-windows"></i>
+                        <h2>PC / Windows</h2>
+                    </div>
+                    <div class="card-body">
+                        <ol class="steps">
+                            <li>No Chrome/Edge, vá em <strong>Configurações</strong> > <strong>Privacidade e
+                                    Segurança</strong>.</li>
+                            <li>Encontre a opção <strong>Usar DNS seguro</strong>.</li>
+                            <li>Selecione "Com" e escolha <strong>OpenDNS</strong> ou Personalizado:</li>
+                            <li>
+                                <div class="dns-box select-all">
+                                    <span>https://dns.adguard.com/dns-query</span>
+                                </div>
+                            </li>
+                        </ol>
+                        <div class="tutorial-image-container" onclick="openImageModal('assets/img/pc_dns.png')">
+                            <img src="assets/img/pc_dns.png" alt="Configuração DNS PC" class="tutorial-image">
+                            <div class="image-hint"><i class="fas fa-search-plus"></i> Ampliar</div>
+                        </div>
+                        <div class="help-fallback">
+                            <p>Opa, se talvez não funcionar clique no link abaixo, levará ao YouTube aonde lá vai
+                                ensinar de forma eficaz como tirar os anúncios de qualquer site, caso não queira mais o
+                                removedor de anúncios é só fazer ao contrário:</p>
+                            <a href="https://youtu.be/QLYth7wrmC8?si=JVoeZG2RHLH13tg4" target="_blank"
+                                class="fallback-link">
+                                <i class="fab fa-youtube"></i> Assistir Tutorial Alternativo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-logo">BlluFlix</div>
+                <p class="footer-text">© 2026 BlluFlix. Todos os direitos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="image-modal" onclick="closeImageModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modal-img">
+        <div class="modal-caption">Toque em qualquer lugar para fechar</div>
+    </div>
+
+    <script>
+
+
+        // Funções do Modal de Imagem
+        function openImageModal(src) {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-img');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            modalImg.src = src;
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+    </script>
+  <script src="assets/js/cinema.js?v=24" defer></script>
+</body>
+
+</html>

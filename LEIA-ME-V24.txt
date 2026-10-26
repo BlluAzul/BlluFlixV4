@@ -1,0 +1,48 @@
+BLLUFLIX V24 — CINEMA EDITION
+====================================
+
+Esta entrega contém o projeto COMPLETO, a partir de "BlluFlix V23 NOVO PLAYER.rar".
+Os arquivos do catálogo, API, player, calendário, páginas de ajuda e pasta
+superflixapi foram mantidos. As melhorias foram feitas sem migrar de framework
+ou exigir dependências adicionais.
+
+O QUE MUDOU
+- Nova identidade visual de cinema, responsiva (computador, tablet, celular).
+- Destaque com pôster 3D interativo, efeito de disco cinematográfico e iluminação.
+- Navegação pelos slides, indicadores numerados e setas.
+- Cards de filmes e séries com profundidade 3D no mouse.
+- Barra de acesso rápido a Filmes, Séries, Em alta e "Surpreenda-me".
+- Modo Cinema que recolhe a barra lateral no computador, salvo no navegador.
+- Atalhos: tecla / para buscar; setas esquerda/direita para trocar destaque.
+- Aviso visual discreto ao adicionar/remover um item dos Salvos.
+- Melhorias de layout nas telas individuais, episódios, calendário e ajuda.
+- Elementos com navegação por teclado e suporte a movimento reduzido.
+- Corrigida duplicação de loadHomePage: a versão com filtro dos destaques,
+  filme fixado e Continuar Assistindo volta a ser a utilizada. A segunda
+  implementação foi preservada como loadHomePageLegacy().
+
+ARQUIVOS NOVOS
+- assets/css/cinema.css       -> nova camada visual; style.css original intacto.
+- assets/js/cinema.js         -> microinterações sem bibliotecas extras.
+- LEIA-ME-V24.txt             -> estas instruções.
+
+ARQUIVOS ALTERADOS
+- index.html / movie.html / series.html / calendar.html / help.html /
+  information.html -> só adição de referências da nova camada visual/interativa.
+- assets/js/app.js -> melhorias no destaque, atalhos e reativação da
+  implementação mais completa da página inicial.
+
+PARA PUBLICAR NO NETLIFY
+1. Descompacte este ZIP.
+2. Publique a pasta que contém o arquivo index.html (junto com assets e demais arquivos).
+3. Não é necessário instalar nada nem rodar npm build.
+4. Se já existir um site publicado, envie este conteúdo substituindo a versão antiga.
+5. Após publicar, use Ctrl+F5 ou atualize a aba para carregar as novas versões de CSS/JS.
+
+NOTAS
+- Dados de filmes e séries continuam vindo da API TMDB; é necessária internet.
+- O player e seus servidores/endpoints continuam os originais do seu projeto.
+- A pasta PHP foi preservada, mas o Netlify estático não executa arquivos PHP.
+- "Modo Cinema" afeta só o layout, não a reprodução.
+- Elementos 3D são feitos em CSS/JavaScript leve, sem Three.js e sem assets pesados.
+- Efeitos de movimento respeitam a configuração de acessibilidade do sistema.
